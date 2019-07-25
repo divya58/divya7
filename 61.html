@@ -1,0 +1,85 @@
+
+
+<?php
+    
+    $weather = "";
+    $error = "";
+    
+    if ($_GET['city']) {
+        
+     $urlContents = file_get_contents("http://api.openweathermap.org/data/2.5/weather?q=".urlencode($_GET['city']).",uk&appid=4b6cbadba309b7554491c5dc66401886");
+        
+        $weatherArray = json_decode($urlContents, true);
+        
+        if ($weatherArray['cod'] == 200) {
+        
+            $weather = "The weather in ".$_GET['city']." is currently '".$weatherArray['weather'][0]['description']."'. ";
+
+            $tempInCelcius = intval($weatherArray['main']['temp'] - 273);
+
+            $weather .= " The temperature is ".$tempInCelcius."&deg;C and the wind speed is ".$weatherArray['wind']['speed']."m/s.";
+            
+        } else {
+            
+            $error = "Could not find city - please try again.";
+            
+        }
+        
+    }
+
+
+?>
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style> 
+input[type=text] {
+  width: 130px;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  background-color: white;
+  background-image: url('searchicon.png');
+  background-position: 10px 10px; 
+  background-repeat: no-repeat;
+  padding: 12px 20px 12px 40px;
+  -webkit-transition: width 0.4s ease-in-out;
+  transition: width 0.4s ease-in-out;
+}
+
+input[type=text]:focus {
+  width: 100%;
+}
+</style>
+</head>
+<body>
+<div>
+<p>Enter the Country.</p>
+
+<form>
+  
+    <input type="text" name="city" id="city" placeholder="Eg. London, Tokyo" value = "<?php echo $_GET['city']; ?>">
+<br>
+  <button type="submit">Submit</button>
+</form>
+      
+          <div id="weather"><?php 
+              
+              if ($weather) {
+                  
+                  echo '<div>'.$weather.'</div>';
+                  
+              } else if ($error) {
+                  
+                  echo '<div>'.$error.'</div>';
+                  
+              }
+              
+              ?></div>
+     </div>
+</body>
+</html>
